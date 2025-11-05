@@ -1,0 +1,61 @@
+CREATE TABLE O_Roll_Call (
+    Roll_no NUMBER PRIMARY KEY,
+    Name VARCHAR2(30),
+    Address VARCHAR2(30)
+);
+
+CREATE TABLE N_Roll_Call (
+    Roll_no NUMBER,
+    Name VARCHAR2(30),
+    Address VARCHAR2(30)
+);
+INSERT INTO O_Roll_Call VALUES (1, 'Bhakti', 'Pune');
+INSERT INTO O_Roll_Call VALUES (2, 'Swaraj', 'Mumbai');
+
+INSERT INTO N_Roll_Call VALUES (2, 'Swaraj', 'Mumbai');
+INSERT INTO N_Roll_Call VALUES (3, 'Aarav', 'Nashik');
+INSERT INTO N_Roll_Call VALUES (4, 'Riya', 'Nagpur');
+COMMIT;
+SET SERVEROUTPUT ON;
+
+DECLARE
+    -- Declare variables
+    v_roll  N_Roll_Call.Roll_no%TYPE;
+    v_name  N_Roll_Call.Name%TYPE;
+    v_addr  N_Roll_Call.Address%TYPE;
+    v_count NUMBER;
+
+    -- Parameterized Cursor: takes roll number as input
+    CURSOR c_merge(p_roll NUMBER) IS
+        SELECT Roll_no, Name, Address
+        FROM N_Roll_Call
+        WHERE Roll_no = p_roll;
+
+BEGIN
+    -- Loop through each record from N_Roll_Call
+    FOR rec IN (SELECT Roll_no FROM N_Roll_Call) LOOP
+
+        -- Check if the roll number already exists in O_Roll_Call
+        SELECT COUNT(*) INTO v_count 
+        FROM O_Roll_Call 
+        WHERE Roll_no = rec.Roll_no;
+
+        -- If not found, open cursor and insert data
+        IF v_count = 0 THEN
+            OPEN c_merge(rec.Roll_no);
+            FETCH c_merge INTO v_roll, v_name, v_addr;
+
+            INSERT INTO O_Roll_Call VALUES (v_roll, v_name, v_addr);
+            DBMS_OUTPUT.PUT_LINE('Inserted Roll No: ' || v_roll || ' - ' || v_name);
+
+            CLOSE c_merge;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Skipped Roll No: ' || rec.Roll_no || ' (Already Exists)');
+        END IF;
+
+    END LOOP;
+
+    DBMS_OUTPUT.PUT_LINE('Data Merging Completed Successfully.');
+END;
+/
+SELECT * FROM O_Roll_Call;
