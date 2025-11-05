@@ -1,0 +1,140 @@
+CREATE DATABASE studentdb;
+USE studentdb;
+
+-- Table 1: Students
+CREATE TABLE students (
+    sid INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50),
+    city VARCHAR(30),
+    age INT
+);
+
+INSERT INTO students (name, city, age) VALUES
+('Bhakti', 'Pune', 20),
+('Swaraj', 'Mumbai', 21),
+('Aarav', 'Nashik', 19),
+('Riya', 'Pune', 22),
+('Aditi', 'Nagpur', 20);
+
+-- Table 2: Courses
+CREATE TABLE courses (
+    cid INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(50)
+);
+
+INSERT INTO courses (course_name) VALUES
+('DBMS'),
+('Web Technology'),
+('AI'),
+('DSA');
+
+-- Table 3: Enrollment (Many-to-Many)
+CREATE TABLE enrollment (
+    sid INT,
+    cid INT,
+    marks INT,
+    FOREIGN KEY (sid) REFERENCES students(sid),
+    FOREIGN KEY (cid) REFERENCES courses(cid)
+);
+
+INSERT INTO enrollment VALUES
+(1, 1, 85),
+(1, 2, 90),
+(2, 3, 78),
+(3, 1, 88),
+(4, 4, 92),
+(5, 2, 80);
+10 SQL Queries
+1️⃣ INNER JOIN
+
+List students and the courses they enrolled in.
+
+SELECT s.name, c.course_name
+FROM students s
+INNER JOIN enrollment e ON s.sid = e.sid
+INNER JOIN courses c ON e.cid = c.cid;
+
+2️⃣ LEFT JOIN
+
+Show all students and their enrolled courses (if any).
+
+SELECT s.name, c.course_name
+FROM students s
+LEFT JOIN enrollment e ON s.sid = e.sid
+LEFT JOIN courses c ON e.cid = c.cid;
+
+3️⃣ RIGHT JOIN
+
+Show all courses and students enrolled (if any).
+
+SELECT c.course_name, s.name
+FROM students s
+RIGHT JOIN enrollment e ON s.sid = e.sid
+RIGHT JOIN courses c ON e.cid = c.cid;
+
+4️⃣ CROSS JOIN
+
+Show every possible student-course combination.
+
+SELECT s.name, c.course_name
+FROM students s
+CROSS JOIN courses c;
+
+5️⃣ SELF JOIN
+
+Find students from the same city.
+
+SELECT s1.name AS Student1, s2.name AS Student2, s1.city
+FROM students s1
+JOIN students s2 ON s1.city = s2.city AND s1.sid < s2.sid;
+
+6️⃣ SUBQUERY (Single Row)
+
+Find students who have marks greater than Bhakti.
+
+SELECT name 
+FROM students
+WHERE sid IN (
+    SELECT sid FROM enrollment 
+    WHERE marks > (SELECT marks FROM enrollment WHERE sid = 1 LIMIT 1)
+);
+
+7️⃣ SUBQUERY (Multiple Rows)
+
+Find students who scored more than 85 marks in any course.
+
+SELECT name
+FROM students
+WHERE sid IN (SELECT sid FROM enrollment WHERE marks > 85);
+
+8️⃣ AGGREGATE with GROUP BY
+
+Show average marks per course.
+
+SELECT c.course_name, AVG(e.marks) AS avg_marks
+FROM courses c
+JOIN enrollment e ON c.cid = e.cid
+GROUP BY c.course_name;
+
+9️⃣ VIEW Creation
+
+Create a view showing student name, course, and marks.
+
+CREATE VIEW student_course_view AS
+SELECT s.name, c.course_name, e.marks
+FROM students s
+JOIN enrollment e ON s.sid = e.sid
+JOIN courses c ON e.cid = c.cid;
+
+
+To see the view:
+
+SELECT * FROM student_course_view;
+
+🔟 VIEW with Condition
+
+Get view data for students from Pune only.
+
+SELECT * FROM student_course_view WHERE name IN (
+    SELECT name FROM students WHERE city = 'Pune'
+);
