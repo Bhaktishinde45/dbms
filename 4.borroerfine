@@ -1,0 +1,70 @@
+CREATE DATABASE LibraryDB;
+USE LibraryDB;
+
+✅ Step 2: Create Tables
+CREATE TABLE Borrower (
+    Roll_no INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Date_of_Issue DATE,
+    Name_of_Book VARCHAR(50),
+    Status CHAR(1)
+);
+
+CREATE TABLE Fine (
+    Roll_no INT,
+    Date_of_Return DATE,
+    Amt DECIMAL(10,2)
+);
+
+Step 3: Insert Sample Data into Borrower
+INSERT INTO Borrower VALUES 
+(1, 'Bhakti', '2025-10-01', 'Python Programming', 'I'),
+(2, 'Swaraj', '2025-10-10', 'Database Systems', 'I'),
+(3, 'Aarav', '2025-10-15', 'AI Basics', 'I');
+DELIMITER //
+
+CREATE PROCEDURE Return_Book(IN rno INT, IN return_date DATE)
+BEGIN
+    DECLARE issue_date DATE;
+    DECLARE days_diff INT;
+    DECLARE fine_amt DECIMAL(10,2);
+
+    -- Get issue date
+    SELECT Date_of_Issue INTO issue_date 
+    FROM Borrower WHERE Roll_no = rno;
+
+    -- Calculate number of days
+    SET days_diff = DATEDIFF(return_date, issue_date);
+
+    -- Default fine
+    SET fine_amt = 0;
+
+    -- Fine calculation logic
+    IF days_diff > 15 AND days_diff <= 30 THEN
+        SET fine_amt = (days_diff - 15) * 5;
+    ELSEIF days_diff > 30 THEN
+        SET fine_amt = (days_diff - 30) * 50 + (15 * 5);
+    END IF;
+
+    -- Update borrower status
+    UPDATE Borrower 
+    SET Status = 'R' 
+    WHERE Roll_no = rno;
+
+    -- If fine applicable, insert into Fine table
+    IF fine_amt > 0 THEN
+        INSERT INTO Fine (Roll_no, Date_of_Return, Amt)
+        VALUES (rno, return_date, fine_amt);
+    END IF;
+
+    -- Show result
+    SELECT CONCAT('Book returned by Roll_no ', rno, 
+                  '. Days: ', days_diff, 
+                  ', Fine: Rs ', fine_amt) AS Result;
+END //
+
+DELIMITER ;
+CALL Return_Book(1, '2025-10-11');
+       CALL Return_Book(2, '2025-10-30');
+CALL Return_Book(3, '2025-11-25');SELECT * FROM Borrower;
+SELECT * FROM Fine;
