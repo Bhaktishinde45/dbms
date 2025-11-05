@@ -1,0 +1,27 @@
+create database studinfo;
+
+mysql> use studinfo;
+Database changed
+
+mysql> create table studdata(id int auto_increment primary key,name varchar(26),age int,grade varchar(45),city varchar(23));
+Query OK, 0 rows affected (0.766 sec)
+
+1)INSERT INTO studdata (name, age, grade, city)
+    VALUES ('Bhakti', 20, 'A', 'Pune'),
+      ('Swaraj', 21, 'B', 'Mumbai'),
+     ('Aarav', 19, 'A', 'Nashik'),
+      ('Riya', 22, 'C', 'Pune'),
+       ('Aditi', 20, 'B', 'Nagpur');
+       
+2)select * from studdata;
+3)select name,city from studdata where city="Pune";
+4) select name,age from studdata where age > 18;
+5)select name,age,grade,city from studdata where grade ="A" and city="Pune";
+6)select count(*) as name from studdata;
+7)update studdata set age=30 where name="Riya";
+8) delete from studdata where name="Aditi";
+9)select name,city from studdata where city="Pune"
+    -> UNION
+    -> select name,city from studdata where grade="A";
+10)select * from studdata where age between 18 and 25 order by age asc;
+       
