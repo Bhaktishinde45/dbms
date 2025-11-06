@@ -1,0 +1,90 @@
+mongosh
+Step 1: Show existing databases
+show dbs
+
+🔹 Step 2: Create/Select Database
+use college
+
+🔹 Step 3: Create a Collection
+db.createCollection("student")
+
+🔹 Step 4: Show Collections
+show collections
+
+
+
+
+student
+
+1. Insert a Single Document
+db.student.insertOne({
+    roll_no: 1,
+    name: "Bhakti",
+    branch: "AI & DS",
+    city: "Jalgaon",
+    marks: 88
+})
+
+2. Insert Multiple Documents
+db.student.insertMany([
+    { roll_no: 2, name: "Swaraj", branch: "AI & DS", city: "Pune", marks: 92 },
+    { roll_no: 3, name: "Aditi", branch: "CSE", city: "Nashik", marks: 75 },
+    { roll_no: 4, name: "Om", branch: "IT", city: "Mumbai", marks: 81 }
+])
+
+
+db.student.find()
+
+
+db.student.find().pretty()
+
+
+db.student.find({ city: "Pune" })
+
+
+db.student.find({ marks: { $gt: 80 } })
+
+
+db.student.find({ $and: [ { city: "Pune" }, { marks: { $gt: 85 } } ] })
+
+
+db.student.find({ $or: [ { city: "Jalgaon" }, { marks: { $gt: 90 } } ] })
+
+
+db.student.find({ marks: { $not: { $gt: 80 } } })
+
+
+db.student.updateOne(
+    { roll_no: 3 },
+    { $set: { marks: 82 } }
+)
+
+db.student.updateMany(
+    { branch: "AI & DS" },
+    { $set: { grade: "A" } }
+)
+
+db.student.save({
+    _id: ObjectId("replace_with_existing_id"),
+    roll_no: 1,
+    name: "Bhakti Shinde",
+    branch: "AI & DS",
+    city: "Jalgaon",
+    marks: 90
+})
+
+
+
+db.student.deleteOne({ roll_no: 4 })
+
+db.student.deleteMany({ marks: { $lt: 80 } })
+
+
+db.student.drop()
+
+db.student.countDocuments()
+
+db.student.find().sort({ marks: -1 })
+
+
+db.student.find().sort({ marks: -1 }).limit(2)
