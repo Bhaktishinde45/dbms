@@ -1,0 +1,3 @@
+select s.rollno,s.name,m.marks from student s inner join marks m on s.rollno=m.rollno;select s.rollno,s.name,m.marks from student s left join marks_info m on s.rollno=m.rollno union select s.rollno,s.name,m.marks from student s right join marks_info m on s.rollno=m.rollno; create view leftjoin
+    -> as
+    -> select s.rollno,s.name,m.marks from student s left join marks_info m on s.rollno=m.rollno; s.rollno=m.rollno;
